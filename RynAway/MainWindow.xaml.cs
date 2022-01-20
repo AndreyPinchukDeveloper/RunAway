@@ -53,8 +53,7 @@ namespace RynAway
             gameTimer.Tick += GameEngine;
             gameTimer.Interval = TimeSpan.FromMilliseconds(20);
 
-            backgroundSprite.ImageSource = new BitmapImage(new Uri("pack://application:,,,/images/background.gif"));//set an your own way here
-
+            backgroundSprite.ImageSource = new BitmapImage(new Uri("pack://application:,,,/Images/background.gif"));
             Background.Fill = backgroundSprite;
             Background2.Fill = backgroundSprite;
 
@@ -64,22 +63,84 @@ namespace RynAway
 
         private void GameEngine(object sender, EventArgs e)
         {
-            Canvas.SetLeft(Background, Canvas.GetLeft(Background) - 7);
-            Canvas.SetLeft(Background2, Canvas.GetLeft(Background2) - 7);
+            Canvas.SetLeft(Background, Canvas.GetLeft(Background) - 4);
+            Canvas.SetLeft(Background2, Canvas.GetLeft(Background2) - 4);
 
             if (Canvas.GetLeft(Background)<-1262)
             {
                 Canvas.SetLeft(Background, Canvas.GetLeft(Background2) + Background2.Width);
             }
 
-            if (Canvas.GetLeft(Background) < -1262)
+            if (Canvas.GetLeft(Background2) < -1262)
             {
-                Canvas.SetLeft(Background2, Canvas.GetLeft(Background) + Background2.Width);
+                Canvas.SetLeft(Background2, Canvas.GetLeft(Background) + Background.Width);
             }
 
-            Canvas.SetTop(Player, Canvas.GetTop(Player) - speed);
+            Canvas.SetTop(Player, Canvas.GetTop(Player) + speed);
             Canvas.SetLeft(obstacle, Canvas.GetLeft(obstacle) - 12);
             scoreText.Content = "Score: " + score;
+
+            playerHitBox = new Rect(Canvas.GetLeft(Player), Canvas.GetTop(Player), Player.Width - 15, Player.Height);
+            obstacleHitBox = new Rect(Canvas.GetLeft(obstacle), Canvas.GetTop(obstacle), obstacle.Width - 15, obstacle.Height - 10);
+            groundHitBox = new Rect(Canvas.GetLeft(ground), Canvas.GetTop(ground), ground.Width - 15, ground.Height - 10);
+
+            if (playerHitBox.IntersectsWith(groundHitBox))
+            {
+                speed = 0;
+                Canvas.SetTop(Player, Canvas.GetTop(ground) - Player.Height);
+                isJumping = false;
+                spriteIndex += .5;
+
+                if (spriteIndex>4)
+                {
+                    spriteIndex = 1;
+                }
+                RunSprite(spriteIndex);
+            }
+
+            if (isJumping==true)
+            {
+                speed = -9;
+                force -= 1;
+            }
+            else
+            {
+                speed = 12;
+            }
+
+            if (force<0)
+            {
+                isJumping = false;
+            }
+
+            if (Canvas.GetLeft(obstacle)<-50)
+            {
+                Canvas.SetLeft(obstacle, 950);
+                Canvas.SetTop(obstacle, obstaclePosition[random.Next(0, obstaclePosition.Length)]);
+
+                score++;
+            }
+
+            if (playerHitBox.IntersectsWith(obstacleHitBox))
+            {
+                gameOver = true;
+                gameTimer.Stop();
+                scoreText.Content = "Score: " + score + " Press Enter to play again !";
+            }
+
+            if (gameOver == true)
+            {
+                obstacle.Stroke = Brushes.Black;
+                obstacle.StrokeThickness = 1;
+
+                Player.Stroke = Brushes.Red;
+                Player.StrokeThickness = 1;
+            }
+            else
+            {
+                Player.StrokeThickness = 0;
+                obstacle.StrokeThickness = 0;
+            }
         }
 
         private void KeyIsDown(object sender, KeyEventArgs e)
@@ -88,17 +149,19 @@ namespace RynAway
             {
                 StartGame();
             }
-        }
 
-        private void KeyIsUp(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Space && isJumping==false && Canvas.GetTop(Player)>260)
+            if (e.Key == Key.Space && isJumping == false && Canvas.GetTop(Player) > 260)
             {
                 isJumping = true;
                 force = 15;
                 speed = -12;
-                playerSprite.ImageSource = new BitmapImage(new Uri("pack://application:,,,/images/background.gif"));//set an your own way here
+                playerSprite.ImageSource = new BitmapImage(new Uri("pack://application:,,,/images/BlackRun 3.png"));
             }
+        }
+
+        private void KeyIsUp(object sender, KeyEventArgs e)
+        {
+            
         }
 
         private void StartGame()
@@ -114,7 +177,7 @@ namespace RynAway
 
             RunSprite(1);
 
-            obstacleSprite.ImageSource = new BitmapImage(new Uri("pack://application:,,,/images/obstacle.png"));//set an your own way here
+            obstacleSprite.ImageSource = new BitmapImage(new Uri("pack://application:,,,/Images/obstacle.png"));
             obstacle.Fill = obstacleSprite;
 
             isJumping = false;
@@ -130,28 +193,16 @@ namespace RynAway
             switch (i)
             {
                 case 1:
-                    playerSprite.ImageSource = new BitmapImage(new Uri("pack://application:,,,/images/runner01.gif"));//set an your own way here
+                    playerSprite.ImageSource = new BitmapImage(new Uri("pack://application:,,,/images/BlackRun 1.png"));
                     break;
                 case 2:
-                    playerSprite.ImageSource = new BitmapImage(new Uri("pack://application:,,,/images/runner02.gif"));//set an your own way here
+                    playerSprite.ImageSource = new BitmapImage(new Uri("pack://application:,,,/images/BlackRun 2.png"));
                     break;
                 case 3:
-                    playerSprite.ImageSource = new BitmapImage(new Uri("pack://application:,,,/images/runner03.gif"));//set an your own way here
+                    playerSprite.ImageSource = new BitmapImage(new Uri("pack://application:,,,/images/BlackRun 3.png"));
                     break;
                 case 4:
-                    playerSprite.ImageSource = new BitmapImage(new Uri("pack://application:,,,/images/runner04.gif"));//set an your own way here
-                    break;
-                case 5:
-                    playerSprite.ImageSource = new BitmapImage(new Uri("pack://application:,,,/images/runner05.gif"));//set an your own way here
-                    break;
-                case 6:
-                    playerSprite.ImageSource = new BitmapImage(new Uri("pack://application:,,,/images/runner06.gif"));//set an your own way here
-                    break;
-                case 7:
-                    playerSprite.ImageSource = new BitmapImage(new Uri("pack://application:,,,/images/runner07.gif"));//set an your own way here
-                    break;
-                case 8:
-                    playerSprite.ImageSource = new BitmapImage(new Uri("pack://application:,,,/images/runner08.gif"));//set an your own way here
+                    playerSprite.ImageSource = new BitmapImage(new Uri("pack://application:,,,/images/BlackRun 4.png"));
                     break;
             }
             Player.Fill = playerSprite;
